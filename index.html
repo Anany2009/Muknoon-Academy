@@ -10,8 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    html,body,#root{min-height:100vh}
+    *{margin:0;padding:0;box-sizing:border-box}html,body,#root{min-height:100vh}
     body{background:#04060d;font-family:'Cairo',sans-serif;-webkit-font-smoothing:antialiased}
     #splash{position:fixed;inset:0;background:#04060d;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;gap:14px;transition:opacity .6s ease}
     .sp-logo{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#0a3a18,#041008);border:3px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 0 40px rgba(201,168,76,.45);animation:spGlow 2.5s ease infinite}
@@ -25,20 +24,15 @@
 </head>
 <body>
   <div id="splash">
-    <div class="sp-logo">&#x262A;&#xFE0F;</div>
+    <div class="sp-logo">☪️</div>
     <div class="sp-name">Muknoon Academy</div>
-    <div class="sp-sub">&#x623;&#x643;&#x627;&#x62F;&#x64A;&#x645;&#x64A;&#x629; &#x645;&#x643;&#x646;&#x648;&#x646; &#x644;&#x644;&#x642;&#x631;&#x622;&#x646; &#x627;&#x644;&#x643;&#x631;&#x64A;&#x645;</div>
+    <div class="sp-sub">أكاديمية مكنون للقرآن الكريم</div>
     <div class="sp-ring"></div>
   </div>
   <div id="root"></div>
-
-  <!-- React 18 via CDN -->
   <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
-  <!-- Babel for JSX -->
   <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
-
-  <!-- App -->
   <script type="text/babel">
 const { useState, useEffect, useCallback, useRef } = React;
 
@@ -461,7 +455,7 @@ const KEY="muk_v5";
 const SEED={
   lang:"ar",
   users:[
-    {id:1,un:"admin",pw:"admin123",role:"admin",name:"المشرف العام",nameEn:"Admin",email:"admin@muknoon.com",phone:"0500000000",country:"SA",dialCode:"+966"},
+    {id:1,un:"muknoon_admin",pw:"Muknoon@2026",role:"admin",name:"المشرف العام",nameEn:"Admin",email:"admin@muknoon.com",phone:"0500000000",country:"SA",dialCode:"+966"},
     {id:2,un:"sheikh1",pw:"pass",role:"teacher",name:"الشيخ محمد أحمد",nameEn:"Sheikh Mohammed",specialty:"حفظ وتجويد",specialtyEn:"Memorization & Tajweed",phone:"0501234567",dialCode:"+966",country:"SA",email:"m@muknoon.com",available:true,bio:"خبرة 15 سنة في تحفيظ القرآن الكريم برواية حفص عن عاصم",bioEn:"15 years experience in Quran memorization",rating:4.9,totalSessions:480,joinDate:"2024-01-15",zoomLink:"https://zoom.us/j/1234567890",meetLink:"https://meet.google.com/muk-abc-123",customLink:"",avatar:"",
       availability:{
         Monday:   ["09:00","10:00","11:00","14:00","15:00"],
@@ -825,6 +819,7 @@ function LanguageSelector({onSelect}){
 // ─────────────────────────── LOGIN ───────────────────────────────────────────
 function Login({db,onLogin,onRegister,onLangChange,L}){
   const [un,setUn]=useState(""); const [pw,setPw]=useState(""); const [err,setErr]=useState(""); const [loading,setLoading]=useState(false);
+  const [activeRole,setActiveRole]=useState("student");
   const go=()=>{
     setErr("");setLoading(true);
     setTimeout(()=>{
@@ -858,6 +853,27 @@ function Login({db,onLogin,onRegister,onLangChange,L}){
           <Sep/>
         </div>
 
+        {/* Role selector */}
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:20}}>
+          {[
+            {role:"admin",  icon:"🛡️", ar:"مشرف",    en:"Admin"},
+            {role:"teacher",icon:"👨‍🏫",ar:"معلم",    en:"Teacher"},
+            {role:"student",icon:"👨‍🎓",ar:"طالب",    en:"Student"},
+          ].map(r=>(
+            <button key={r.role} onClick={()=>setActiveRole(r.role)} style={{
+              background:activeRole===r.role?`${T.gold}15`:T.bg,
+              border:`2px solid ${activeRole===r.role?T.gold:T.border}`,
+              borderRadius:12,padding:"10px 6px",cursor:"pointer",
+              color:activeRole===r.role?T.gold:T.muted,
+              fontFamily:LANG[L].font,fontSize:12,fontWeight:activeRole===r.role?800:400,
+              transition:"all .2s",textAlign:"center",
+            }}>
+              <div style={{fontSize:22,marginBottom:4}}>{r.icon}</div>
+              <div>{L==="ar"?r.ar:r.en}</div>
+            </button>
+          ))}
+        </div>
+
         <Inp label={t(L,"username")} value={un} onChange={setUn} ph={t(L,"username")}/>
         <Inp label={t(L,"password")} value={pw} onChange={setPw} type="password" ph="••••••••"/>
         {err&&<div style={{background:T.redBg,border:`1px solid ${T.red}44`,borderRadius:10,padding:"10px 14px",color:T.redL,fontSize:13,marginBottom:14,textAlign:"center"}}>⚠️ {err}</div>}
@@ -873,19 +889,7 @@ function Login({db,onLogin,onRegister,onLangChange,L}){
         </div>
 
         <div style={{marginTop:8,textAlign:"center"}}>
-          <button onClick={()=>{if(window.confirm(L==="ar"?"مسح البيانات؟":"Reset all data?")){localStorage.removeItem(KEY);localStorage.removeItem("muk_emails");window.location.reload();}}} style={{background:"none",border:"none",color:T.muted,fontSize:11,cursor:"pointer",textDecoration:"underline"}}>{t(L,"resetData")}</button>
-        </div>
-
-        <div style={{marginTop:12,background:T.bg,borderRadius:12,padding:14,border:`1px solid ${T.border}`}}>
-          <div style={{color:T.muted,fontSize:11,marginBottom:8,textAlign:"center"}}>▸ {t(L,"demoAccounts")}</div>
-          {demos.map(([u,p,r,ic])=>(
-            <div key={u} onClick={()=>{setUn(u);setPw(p);}} style={{cursor:"pointer",padding:"6px 10px",borderRadius:8,marginBottom:3,display:"flex",alignItems:"center",gap:10,transition:"background .2s"}}
-              onMouseEnter={e=>e.currentTarget.style.background=T.card} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-              <span style={{fontSize:18}}>{ic}</span>
-              <span style={{color:T.gold,fontSize:12,fontWeight:700,width:48}}>{r}</span>
-              <span style={{color:T.textD,fontSize:12,fontFamily:"monospace"}}>{u} / {p}</span>
-            </div>
-          ))}
+          <button onClick={()=>{if(window.confirm(L==="ar"?"مسح البيانات؟":"Reset all data?")){localStorage.removeItem(KEY);localStorage.removeItem("muk_emails");window.location.reload();}}} style={{background:"none",border:"none",color:T.muted,fontSize:10,cursor:"pointer",textDecoration:"underline",opacity:.4}}>{t(L,"resetData")}</button>
         </div>
       </div>
     </div>
@@ -4381,6 +4385,17 @@ function App(){
 
   useEffect(()=>{persist(db);},[db]);
 
+  // Browser back button support
+  useEffect(()=>{
+    const handlePop=()=>{ setPage(p=>p==="home"?p:"home"); };
+    window.addEventListener("popstate",handlePop);
+    return()=>window.removeEventListener("popstate",handlePop);
+  },[]);
+
+  useEffect(()=>{
+    if(user&&page) window.history.pushState({page},"",window.location.pathname);
+  },[page,user]);
+
   const addNotif=useCallback(n=>{
     const notif={id:Date.now(),...n,time:Date.now(),readBy:[]};
     setDb(p=>({...p,notifications:[notif,...p.notifications]}));
@@ -4511,7 +4526,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(
 
 setTimeout(function(){
   var s=document.getElementById("splash");
-  if(s){s.style.opacity="0";s.style.transition="opacity 0.6s";setTimeout(function(){s.remove()},600);}
+  if(s){s.style.opacity="0";s.style.transition="opacity 0.6s";setTimeout(function(){s.remove();},600);}
 },800);
 
   </script>
